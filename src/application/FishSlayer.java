@@ -15,6 +15,12 @@ public class FishSlayer extends Application{
 	private static final int HEIGHT = 600;
 	private static final int PLAYER_SIZE = 60;
 	
+	static final int EXPLOSION_W = 128;
+	static final int EXPLOSION_H = 128;
+	static final int EXPLOSION_ROWS = 3;
+	static final int EXPLOSION_COL = 3;
+	static final int EXPLOSION_STEPS = 15;
+	
 	static final Image PLAYER_IMG = new Image("file:src/application/img/player.png");
 	static final Image CAUGHT_IMG = new Image("file:src/application/img/caught.png");
 	
@@ -33,7 +39,7 @@ public class FishSlayer extends Application{
 		new Image("file:src/application/img/12.png")
 	};
 	
-	final int MAX_FISHES = 12;
+	final int MAX_FISHES = 6;
 	final int MAX_SHOTS = MAX_FISHES;
 	boolean gameOver = false;
 	private GraphicsContext gc;
@@ -50,8 +56,8 @@ public class FishSlayer extends Application{
 	public class Ship {
 		int posX, posY, size;
 		Image img;
-//		boolean exploding, destroyed;
-//		int explosionStep = 0;
+		boolean exploding, destroyed;
+		int explosionStep = 0;
 		
 		public Ship(int posX, int posY, int size, Image image) {
 			this.posX = posX;
@@ -65,17 +71,17 @@ public class FishSlayer extends Application{
 		}
 		
 		public void update() {
-//			if (exploding) explosionStep++;
-//			destroyed = explosionStep > EXPLOSION_STEPS;
+			if (exploding) explosionStep++;
+			destroyed = explosionStep > EXPLOSION_STEPS;
 		}
 		
 		public void draw() {
-//			if (exploding) {
-//				gc.drawImage(EXPLOSION_IMG, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
-//						(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, EXPLOSION_H, posX, posY, size, size);
-//			} else {
-//				gc.drawImage(img, posY, posX, size, size);
-//			}
+			if (exploding) {
+				gc.drawImage(EXPLOSION_IMG, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
+						(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, EXPLOSION_H, posX, posY, size, size);
+			} else {
+				gc.drawImage(img, posY, posX, size, size);
+			}
 		}
 		
 		public boolean collide(Ship other) {
@@ -85,8 +91,8 @@ public class FishSlayer extends Application{
 		}
 		
 		public void explode() {
-//			exploding = true;
-//			explosionStep = -1;
+			exploding = true;
+			explosionStep = -1;
 		}
 	}
 }
