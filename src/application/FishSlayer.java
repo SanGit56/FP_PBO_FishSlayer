@@ -54,12 +54,13 @@ public class FishSlayer extends Application{
 	
 	//run graphics
   	private void run(GraphicsContext gc) {
-  		gc.setFill(Color.grayRgb(20));
-  		gc.fillRect(0, 0, WIDTH, HEIGHT);
-  		gc.setTextAlign(TextAlignment.CENTER);
-  		gc.setFont(Font.font(20));
-  		gc.setFill(Color.WHITE);
-  		gc.fillText("Score: " + score, 60, 20);
+  		gc.setFill(Color.ROYALBLUE);
+		gc.fillRect(0, 0, WIDTH, HEIGHT);
+		gc.setTextAlign(TextAlignment.CENTER);
+		gc.setFont(Font.font(20));
+		gc.setFill(Color.WHITE);
+		gc.fillText("Score: " + score, 60,  20);
+		gc.fillText("Health: " + nyawa + " %", 720,  20);
 
   		if(gameOver) {
   			gc.setFont(Font.font(35));
@@ -74,10 +75,20 @@ public class FishSlayer extends Application{
 		player.posX= (int) mouseX;
 
 		fishes.stream().peek(Ship::update).peek(Ship::draw).forEach(e ->{
-			if(player.collide(e) && !player.exploding) {
-				player.explode();
+			for (Fish fish : fishes) {
+				if(player.collide(fish) && !fish.exploding && !player.exploding) {
+					fish.explode();
+					gameOver=false;
+					nyawa-=20;
+				}
 			}
 		});
+		
+		if(nyawa==0) {
+			player.explode();
+			player.destroyed=true;
+			gameOver=player.destroyed;
+		}
 			
 		for(int i = nets.size() - 1; i >= 0 ; i--) {
 			Net net = nets.get(i);
@@ -98,11 +109,9 @@ public class FishSlayer extends Application{
 			
 		for(int i = fishes.size() - 1; i>=0; i--) {
 			if(fishes.get(i).destroyed) {
-				fishes.set(i,newBomb());
+				fishes.set(i,newFish());
 			}
 		}
-		
-		gameOver = player.destroyed;
 		
 		if(RAND.nextInt(10)>2) {
 			oceans.add(new Ocean());
@@ -148,6 +157,7 @@ public class FishSlayer extends Application{
 		fishes = new ArrayList<>();
 		player = new Ship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
 		score = 0;
+		nyawa = 100;
 		IntStream.range(0, MAX_FISHES).mapToObj(i -> this.newFish()).forEach(fishes::add);
 	}
 	
