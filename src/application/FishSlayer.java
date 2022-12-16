@@ -40,7 +40,7 @@ public class FishSlayer extends Application{
 	static final int EXPLOSION_STEPS = 15;
 	
 	static final Image PLAYER_IMG = new Image("file:src/application/img/player.png");
-	static final Image EXPLOSION_IMG = new Image("file:src/application/img/ded.png");
+	static final Image EXPLOSION_IMG = new Image("file:src/application/img/explosion.png");
 	static final Image CAUGHT_IMG = new Image("file:src/application/img/caught.png");
 	static final Image BONUSFISH_IMG = new Image("file:src/application/img/bonus.png");
 	
