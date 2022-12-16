@@ -15,8 +15,8 @@ Berbasis bahasa pemrograman Java dan menggunakan library JavaFX. Dikembangkan ol
 ## Fitur Tambahan
 
 ## Pergantian Tema
--Mengganti tema luar angkasa pada video referensi menjadi bawah laut
--Player yang sebelumnya menggunakan roket, sekarang menggunakan kapal selam
+-Mengganti tema luar angkasa pada video referensi menjadi bawah laut/n
+-Player yang sebelumnya menggunakan roket, sekarang menggunakan kapal selam/n
 -Player akan menembakkan jaring pada ikan yang menuju ke player dan memperoleh skor sebanyakmungkin
 
 ## Referensi
