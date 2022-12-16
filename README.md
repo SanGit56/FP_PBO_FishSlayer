@@ -9,8 +9,15 @@ Berbasis bahasa pemrograman Java dan menggunakan library JavaFX. Dikembangkan ol
 
 ## Fitur Bawaan
 1. Objek pemain (dapat menembak dan meledak saat bertabrakan)
+2. Objek pesawat (dapat muncul secara berkala dan akan memberikan poin ketika terkena tembakan pemain)
+3. Game Over(memunculkan jumlah skor yang didapatkan dan akan memainkan game kembali apabila player menekan pada layar) 
 
 ## Fitur Tambahan
+
+## Pergantian Tema
+-Mengganti tema luar angkasa pada video referensi menjadi bawah laut
+-Player yang sebelumnya menggunakan roket, sekarang menggunakan kapal selam
+-Player akan menembakkan jaring pada ikan yang menuju ke player dan memperoleh skor sebanyakmungkin
 
 ## Referensi
 1. [Video bagian 1](https://www.youtube.com/watch?v=0szmaHH1hno)
