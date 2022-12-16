@@ -21,3 +21,4 @@ Berbasis bahasa pemrograman Java dan menggunakan library JavaFX. Dikembangkan ol
 
 ## Referensi
 1. [Video bagian 1](https://www.youtube.com/watch?v=0szmaHH1hno)
+2. [Video bagian 2](https://www.youtube.com/watch?v=dzcQgv9hqXI)
