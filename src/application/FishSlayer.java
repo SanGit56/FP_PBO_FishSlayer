@@ -21,22 +21,22 @@ public class FishSlayer extends Application{
 	static final int EXPLOSION_COL = 3;
 	static final int EXPLOSION_STEPS = 15;
 	
-	static final Image PLAYER_IMG = new Image("file:src/application/img/player.png");
-	static final Image CAUGHT_IMG = new Image("file:src/application/img/caught.png");
+	static final Image PLAYER_IMG = new Image("file:src/application/images/player.png");
+	static final Image CAUGHT_IMG = new Image("file:src/application/images/caught.png");
 	
 	static final Image FISHES_IMG[] = {
-		new Image("file:src/application/img/01.png"),
-		new Image("file:src/application/img/02.png"),
-		new Image("file:src/application/img/03.png"),
-		new Image("file:src/application/img/04.png"),
-		new Image("file:src/application/img/05.png"),
-		new Image("file:src/application/img/06.png"),
-		new Image("file:src/application/img/07.png"),
-		new Image("file:src/application/img/08.png"),
-		new Image("file:src/application/img/09.png"),
-		new Image("file:src/application/img/10.png"),
-		new Image("file:src/application/img/11.png"),
-		new Image("file:src/application/img/12.png")
+		new Image("file:src/application/images/01.png"),
+		new Image("file:src/application/images/02.png"),
+		new Image("file:src/application/images/03.png"),
+		new Image("file:src/application/images/04.png"),
+		new Image("file:src/application/images/05.png"),
+		new Image("file:src/application/images/06.png"),
+		new Image("file:src/application/images/07.png"),
+		new Image("file:src/application/images/08.png"),
+		new Image("file:src/application/images/09.png"),
+		new Image("file:src/application/images/10.png"),
+		new Image("file:src/application/images/11.png"),
+		new Image("file:src/application/images/12.png")
 	};
 	
 	final int MAX_FISHES = 6;
@@ -52,6 +52,9 @@ public class FishSlayer extends Application{
 	private double mouseX;
 	private int score;
 	private int level;
+	
+	boolean shipDestroyed = false;
+	static final Image shipExplode = new Image("src/application/images/explosion.png");
 	
 	//run graphics
   	private void run(GraphicsContext gc) {
@@ -87,6 +90,7 @@ public class FishSlayer extends Application{
 		});
 		
 		if(nyawa==0) {
+			shipDestroyed=true;
 			player.explode();
 			player.destroyed=true;
 			gameOver=player.destroyed;
@@ -192,11 +196,22 @@ public class FishSlayer extends Application{
 		}
 		
 		public void draw() {
-			if (exploding) {
-				gc.drawImage(EXPLOSION_IMG, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
+			if(shipDestroyed){
+				if (exploding) {
+				gc.drawImage(shipExplode, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
 						(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, EXPLOSION_H, posX, posY, size, size);
-			} else {
-				gc.drawImage(img, posY, posX, size, size);
+				} 
+				else {
+					gc.drawImage(img, posY, posX, size, size);
+				}
+			}
+			else{
+				if (exploding) {
+					gc.drawImage(CAUGHT_IMG, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
+							(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, EXPLOSION_H, posX, posY, size, size);
+				} else {
+					gc.drawImage(img, posY, posX, size, size);
+				}
 			}
 		}
 		
