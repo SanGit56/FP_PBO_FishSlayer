@@ -1,12 +1,24 @@
 package application;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class FishSlayer extends Application{
 //	variables
@@ -22,6 +34,7 @@ public class FishSlayer extends Application{
 	static final int EXPLOSION_STEPS = 15;
 	
 	static final Image PLAYER_IMG = new Image("file:src/application/img/player.png");
+	static final Image EXPLOSION_IMG = new Image("file:src/application/img/ded.png");
 	static final Image CAUGHT_IMG = new Image("file:src/application/img/caught.png");
 	
 	static final Image FISHES_IMG[] = {
@@ -52,8 +65,50 @@ public class FishSlayer extends Application{
 	private double mouseX;
 	private int score;
 	private int level;
+	private int health;
 	
-	//run graphics
+//	start canvas
+	public void start(Stage stage) throws Exception {
+		Canvas canvas = new Canvas(WIDTH, HEIGHT);	
+		gc = canvas.getGraphicsContext2D();
+
+		Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), e -> run(gc)));
+		timeline.setCycleCount(Timeline.INDEFINITE);
+		timeline.play();
+
+		canvas.setCursor(Cursor.MOVE);
+		canvas.setOnMouseMoved(e -> mouseX = e.getX());
+
+		canvas.setOnMouseClicked(e -> {
+			if(nets.size() < MAX_SHOTS) 
+				nets.add(player.shoot());
+			
+			if(gameOver) { 
+				gameOver = false;
+				setup();
+			}
+		});
+
+		setup();
+			
+		stage.setScene(new Scene(new StackPane(canvas)));
+		stage.setTitle("Fish Slayer");
+		stage.show();
+	}
+	
+//	initialize variables value
+	private void setup() {
+		oceans = new ArrayList<>();
+		nets = new ArrayList<>();
+		fishes = new ArrayList<>();
+		player = new Ship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
+		score = 0;
+		health = 100;
+		level = 1;
+		IntStream.range(0, MAX_FISHES).mapToObj(i -> this.newFish()).forEach(fishes::add);
+	}
+	
+//	run graphics (frame)
   	private void run(GraphicsContext gc) {
   		gc.setFill(Color.ROYALBLUE);
 		gc.fillRect(0, 0, WIDTH, HEIGHT);
@@ -61,13 +116,13 @@ public class FishSlayer extends Application{
 		gc.setFont(Font.font(20));
 		gc.setFill(Color.WHITE);
 		gc.fillText("Score: " + score, 60,  20);
-		gc.fillText("Level: " + score, 60,  40);
-		gc.fillText("Health: " + nyawa + " %", 720,  20);
+		gc.fillText("Level: " + level, 60,  40);
+		gc.fillText("Health: " + health + " %", 720,  20);
 
   		if(gameOver) {
   			gc.setFont(Font.font(35));
   			gc.setFill(Color.YELLOW);
-  			gc.fillText("GameOver \n Your Score is: " + score + "\nClick to play again", WIDTH/2, HEIGHT/2.5);
+  			gc.fillText("Game Over \n Your Score is: " + score + "\nClick to play again", WIDTH/2, HEIGHT/2.5);
   		}
   		
   		oceans.forEach(Ocean::draw);
@@ -81,12 +136,12 @@ public class FishSlayer extends Application{
 				if(player.collide(fish) && !fish.exploding && !player.exploding) {
 					fish.explode();
 					gameOver=false;
-					nyawa-=20;
+					health -= 20;
 				}
 			}
 		});
 		
-		if(nyawa==0) {
+		if(health == 0) {
 			player.explode();
 			player.destroyed=true;
 			gameOver=player.destroyed;
@@ -128,45 +183,6 @@ public class FishSlayer extends Application{
 				oceans.remove(i);
 		}
 	}
-	//start
-	public void start(Stage stage) throws Exception {
-		Canvas canvas = new Canvas(WIDTH, HEIGHT);	
-		gc = canvas.getGraphicsContext2D();
-
-		Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), e -> run(gc)));
-		timeline.setCycleCount(Timeline.INDEFINITE);
-		timeline.play();
-
-		canvas.setCursor(Cursor.MOVE);
-		canvas.setOnMouseMoved(e -> mouseX = e.getX());
-
-		canvas.setOnMouseClicked(e -> {
-			if(nets.size() < MAX_SHOTS) 
-				nets.add(player.shoot());
-			
-			if(gameOver) { 
-				gameOver = false;
-				setup();
-			}
-		});
-
-		setup();
-			
-		stage.setScene(new Scene(new StackPane(canvas)));
-		stage.setTitle("Fish Slayer");
-		stage.show();
-	}
-	
-	private void setup() {
-		oceans = new ArrayList<>();
-		nets = new ArrayList<>();
-		fishes = new ArrayList<>();
-		player = new Ship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
-		score = 0;
-		nyawa = 100;
-		level = 1;
-		IntStream.range(0, MAX_FISHES).mapToObj(i -> this.newFish()).forEach(fishes::add);
-	}
 	
 //	player
 	public class Ship {
@@ -193,7 +209,7 @@ public class FishSlayer extends Application{
 		
 		public void draw() {
 			if (exploding) {
-				gc.drawImage(EXPLOSION_IMG, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
+				gc.drawImage(CAUGHT_IMG, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
 						(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, EXPLOSION_H, posX, posY, size, size);
 			} else {
 				gc.drawImage(img, posY, posX, size, size);
@@ -228,7 +244,7 @@ public class FishSlayer extends Application{
 	
 	public class Net {
 		public boolean toRemove;
-		Image img=new Image("file:src/application/img/net.png");
+		Image img = new Image("file:src/application/img/net.png");
 		
 		int posX = 10;
 		int posY = 10;
@@ -265,21 +281,20 @@ public class FishSlayer extends Application{
 	public class Ocean {
 		int posX;
 		int posY;
-		private int h;
 		private int w;
 		private int r;
 		private int g;
 		private int b;
+		private double opacity;
 		
-		public Universe() {
+		public Ocean() {
 			posX = RAND.nextInt(WIDTH);
 			posY = 0;
 			
-			w = RAND.nestInt(5) + 1;
-			h = RAND.nestInt(5) + 1;
-			r = RAND.nestInt(100) + 150;
-			g = RAND.nestInt(100) + 150;
-			b = RAND.nestInt(100) + 150;
+			w = RAND.nextInt(5) + 1;
+			r = RAND.nextInt(100) + 150;
+			g = RAND.nextInt(100) + 150;
+			b = RAND.nextInt(100) + 150;
 			
 			opacity = RAND.nextFloat();
 			if(opacity < 0) opacity *= -1;
@@ -290,7 +305,7 @@ public class FishSlayer extends Application{
 			if(opacity > 0.8) opacity -= 0.01;
 			if(opacity < 0.1) opacity += 0.01;
 			gc.setFill(Color.rgb(r, g, b, opacity));
-			gc.fillOval(posX, posY, w, h);
+			gc.fillOval(posX, posY, w, b);
 			posY += 20;
 		}
 	}
@@ -301,7 +316,7 @@ public class FishSlayer extends Application{
 	}
 	
 	int distance (int x1, int y1, int x2, int y2) {
-		return (int) Math.sqrt(Math.pow(x1 - x2), 2) + Math.pow((y1 - y2), 2));
+		return (int) Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow((y1 - y2), 2));
 	}
 	
 	public static void main(String[] args) {
