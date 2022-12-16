@@ -42,6 +42,7 @@ public class FishSlayer extends Application{
 	static final Image PLAYER_IMG = new Image("file:src/application/img/player.png");
 	static final Image EXPLOSION_IMG = new Image("file:src/application/img/ded.png");
 	static final Image CAUGHT_IMG = new Image("file:src/application/img/caught.png");
+	static final Image BONUSFISH_IMG = new Image("file:src/application/img/bonus.png");
 	
 	static final Image FISHES_IMG[] = {
 		new Image("file:src/application/img/1.png"),
@@ -53,17 +54,16 @@ public class FishSlayer extends Application{
 		new Image("file:src/application/img/7.png"),
 		new Image("file:src/application/img/8.png"),
 		new Image("file:src/application/img/9.png"),
-		new Image("file:src/application/img/10.png"),
-		new Image("file:src/application/img/11.png"),
-		new Image("file:src/application/img/12.png")
+		new Image("file:src/application/img/10.png")
 	};
 	
-	final int MAX_FISHES = 6;
-	final int MAX_SHOTS = MAX_FISHES;
+	final int MAX_FISHES = 5;
+	final int MAX_SHOTS = MAX_FISHES * 2;
 	boolean gameOver = false;
 	private GraphicsContext gc;
 	
 	Ship player;
+	Fish bonusFish;
 	List<Net> nets;
 	List<Ocean> oceans;
 	List<Fish> fishes;
@@ -155,7 +155,7 @@ public class FishSlayer extends Application{
 		gc.fillText("Score: " + score, 5,  20);
 		gc.fillText("Level: " + level, 5,  40);
 		gc.fillText("High Score: " + highScore, 5,  60);
-		gc.fillText("Health: " + health + " %", 720,  20);
+		gc.fillText("Health: " + health + " %", 730,  20);
 
   		if(gameOver) {
   			gc.setTextAlign(TextAlignment.CENTER);
@@ -197,8 +197,8 @@ public class FishSlayer extends Application{
 		
 		if(health == 0) {
 			player.explode();
-			player.destroyed=true;
-			gameOver=player.destroyed;
+			player.destroyed = true;
+			gameOver = player.destroyed;
 		}
 			
 		for(int i = nets.size() - 1; i >= 0 ; i--) {
@@ -219,8 +219,15 @@ public class FishSlayer extends Application{
 					net.toRemove= true;
 					if(score % 20 == 0){
 						level++;
-						//break;
 					}
+				}
+			}
+			
+			if (bonusFish != null) {
+				if(bonusFish.collide(bonusFish) && !bonusFish.exploding) {
+					score += 3;
+					bonusFish.explode();
+					net.toRemove = true;
 				}
 			}
 		}
@@ -242,9 +249,17 @@ public class FishSlayer extends Application{
 		
 		if (score > 0 && score % 10 == 0) {
 			if (!(scoreThen == score)) {
-//				bos = newBoss();
+				bonusFish = newBonusFish();
 				scoreThen = score;
 			}
+		}
+		
+		if (bonusFish != null) {
+			if(player.collide(bonusFish) && !player.exploding) {
+                player.explode();
+            }
+			bonusFish.update();
+			bonusFish.draw();
 		}
 	}
 	
@@ -293,15 +308,16 @@ public class FishSlayer extends Application{
 	}
 	
 	public class Fish extends Ship {
-		int SPEED = (score / 5) + 2;
+		int fishSpeed;
 		
-		public Fish (int posX, int posY, int size, Image image) {
+		public Fish (int posX, int posY, int size, Image image, int speed) {
 			super(posX, posY, size, image);
+			fishSpeed = speed;
 		}
 		
 		public void update() {
 			super.update();
-			if(!exploding && !destroyed) posY += SPEED;
+			if(!exploding && !destroyed) posY += fishSpeed;
 			if(posY > HEIGHT) destroyed = true;
 		}
 	}
@@ -375,9 +391,13 @@ public class FishSlayer extends Application{
 	}
 	
 	Fish newFish() {
-		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, FISHES_IMG[RAND.nextInt(FISHES_IMG.length)]);
+		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, FISHES_IMG[RAND.nextInt(FISHES_IMG.length)], (score/5)+2);
 		
 	}
+    
+    Fish newBonusFish() {
+        return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, PLAYER_IMG, 20);
+    }
 	
 	int distance (int x1, int y1, int x2, int y2) {
 		return (int) Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow((y1 - y2), 2));
