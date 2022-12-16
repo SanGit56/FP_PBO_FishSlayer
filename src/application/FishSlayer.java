@@ -42,21 +42,20 @@ public class FishSlayer extends Application{
 
 	static final Image PLAYER_IMG = new Image("file:src/application/images/player.png");
 	static final Image CAUGHT_IMG = new Image("file:src/application/images/caught.png");
-	static final Image BONUSFISH_IMG = new Image("file:src/application/img/bonus.png");
+	static final Image BONUSFISH_IMG = new Image("file:src/application/images/bonus.png");
+	static final Image EXPLOSION_IMG = new Image("file:src/application/images/explosion.png");
 	
 	static final Image FISHES_IMG[] = {
-		new Image("file:src/application/images/01.png"),
-		new Image("file:src/application/images/02.png"),
-		new Image("file:src/application/images/03.png"),
-		new Image("file:src/application/images/04.png"),
-		new Image("file:src/application/images/05.png"),
-		new Image("file:src/application/images/06.png"),
-		new Image("file:src/application/images/07.png"),
-		new Image("file:src/application/images/08.png"),
-		new Image("file:src/application/images/09.png"),
-		new Image("file:src/application/images/10.png"),
-		new Image("file:src/application/images/11.png"),
-		new Image("file:src/application/images/12.png")
+		new Image("file:src/application/img/1.png"),
+		new Image("file:src/application/img/2.png"),
+		new Image("file:src/application/img/3.png"),
+		new Image("file:src/application/img/4.png"),
+		new Image("file:src/application/img/5.png"),
+		new Image("file:src/application/img/6.png"),
+		new Image("file:src/application/img/7.png"),
+		new Image("file:src/application/img/8.png"),
+		new Image("file:src/application/img/9.png"),
+		new Image("file:src/application/img/10.png")
 	};
 	
 	final int MAX_FISHES = 5;
@@ -78,9 +77,7 @@ public class FishSlayer extends Application{
 	private int limit;
 	private int scoreThen;
 	private File highScoreFile = new File("highscore.txt");
-
 	boolean shipDestroyed = false;
-	static final Image shipExplode = new Image("src/application/images/explosion.png");
 
 //	start canvas
 	public void start(Stage stage) throws Exception {
@@ -168,7 +165,7 @@ public class FishSlayer extends Application{
   			gc.setFill(Color.YELLOW);
   			gc.fillText("Game Over\nYour Score is: " + score + "\nClick to play again", WIDTH/2, HEIGHT/2.5);
   			
-//  		tulis skor ke file setiap kali mati
+//  		write score to file every game over
             if (limit == 1) {
                 try {
                     BufferedWriter output = new BufferedWriter(new FileWriter(highScoreFile, true));
@@ -201,7 +198,7 @@ public class FishSlayer extends Application{
 		});
 		
 		if(health == 0) {
-			shipDestroyed=true;
+			shipDestroyed = true;
 			player.explode();
 			player.destroyed = true;
 			gameOver = player.destroyed;
@@ -293,24 +290,17 @@ public class FishSlayer extends Application{
 		}
 		
 		public void draw() {
-			if(shipDestroyed){
-				if (exploding) {
-				gc.drawImage(shipExplode, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
-						(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, EXPLOSION_H, posX, posY, size, size);
-				} 
-				else {
-					gc.drawImage(img, posY, posX, size, size);
-				}
-			}
-			else{
-				if (exploding) {
+			if (exploding) {
+				if (shipDestroyed) {
+					gc.drawImage(EXPLOSION_IMG, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
+							(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, 
+							EXPLOSION_H, posX, posY, size, size);
+				} else {
 					gc.drawImage(CAUGHT_IMG, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
-							(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, EXPLOSION_H, posX, posY, size, size);
-				} 
-        			else {
-					gc.drawImage(img, posY, posX, size, size);
+							(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, 
+							EXPLOSION_H, posX, posY, size, size);
 				}
-			}
+			} else gc.drawImage(img, posY, posX, size, size);
 		}
 		
 		public boolean collide(Ship other) {
@@ -409,11 +399,12 @@ public class FishSlayer extends Application{
 	}
 	
 	Fish newFish() {
-		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, FISHES_IMG[RAND.nextInt(FISHES_IMG.length)], (score/5)+2);
+		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, 
+				FISHES_IMG[RAND.nextInt(FISHES_IMG.length)], (score/5)+2);
 		
 	}
     
-    	Fish newBonusFish() {
+    Fish newBonusFish() {
 		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, PLAYER_IMG, 20);
 	}
 	
