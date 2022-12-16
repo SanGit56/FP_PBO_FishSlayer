@@ -51,6 +51,7 @@ public class FishSlayer extends Application{
 	
 	private double mouseX;
 	private int score;
+	private int level;
 	
 	//run graphics
   	private void run(GraphicsContext gc) {
@@ -60,6 +61,7 @@ public class FishSlayer extends Application{
 		gc.setFont(Font.font(20));
 		gc.setFill(Color.WHITE);
 		gc.fillText("Score: " + score, 60,  20);
+		gc.fillText("Level: " + score, 60,  40);
 		gc.fillText("Health: " + nyawa + " %", 720,  20);
 
   		if(gameOver) {
@@ -103,6 +105,10 @@ public class FishSlayer extends Application{
 					score++;
 					fish.explode();
 					net.toRemove= true;
+					if(score % 20 == 0){
+						level++;
+						//break;
+					}
 				}
 			}
 		}
@@ -158,6 +164,7 @@ public class FishSlayer extends Application{
 		player = new Ship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
 		score = 0;
 		nyawa = 100;
+		level = 1;
 		IntStream.range(0, MAX_FISHES).mapToObj(i -> this.newFish()).forEach(fishes::add);
 	}
 	
