@@ -157,7 +157,7 @@ public class FishSlayer extends Application{
 		gc.fillText("Score: " + score, 5,  20);
 		gc.fillText("Level: " + level, 5,  40);
 		gc.fillText("High Score: " + highScore, 5,  60);
-		gc.fillText("Health: " + health + " %", 730,  20);
+		gc.fillText("Health: " + health + " %", 670,  20);
 
   		if(gameOver) {
   			gc.setTextAlign(TextAlignment.CENTER);
@@ -227,7 +227,7 @@ public class FishSlayer extends Application{
 			}
 			
 			if (bonusFish != null) {
-				if(bonusFish.collide(bonusFish) && !bonusFish.exploding) {
+				if(net.collide(bonusFish) && !bonusFish.exploding) {
 					score += 3;
 					bonusFish.explode();
 					net.toRemove = true;
@@ -259,7 +259,7 @@ public class FishSlayer extends Application{
 		
 		if (bonusFish != null) {
 			if(player.collide(bonusFish) && !player.exploding) {
-                		player.explode();
+                		health--;
             		}
 			bonusFish.update();
 			bonusFish.draw();
@@ -395,7 +395,7 @@ public class FishSlayer extends Application{
 			if(opacity > 0.8) opacity -= 0.01;
 			if(opacity < 0.1) opacity += 0.01;
 			gc.setFill(Color.rgb(r, g, b, opacity));
-			gc.fillOval(posX, posY, w, b);
+			gc.fillOval(posX, posY, w, h);
 			posY += 20;
 		}
 	}
