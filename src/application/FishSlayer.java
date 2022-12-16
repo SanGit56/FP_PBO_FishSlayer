@@ -1,12 +1,30 @@
 package application;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class FishSlayer extends Application{
 //	variables
@@ -21,6 +39,7 @@ public class FishSlayer extends Application{
 	static final int EXPLOSION_COL = 3;
 	static final int EXPLOSION_STEPS = 15;
 	
+
 	static final Image PLAYER_IMG = new Image("file:src/application/images/player.png");
 	static final Image CAUGHT_IMG = new Image("file:src/application/images/caught.png");
 	
@@ -39,100 +58,30 @@ public class FishSlayer extends Application{
 		new Image("file:src/application/images/12.png")
 	};
 	
-	final int MAX_FISHES = 6;
-	final int MAX_SHOTS = MAX_FISHES;
+	final int MAX_FISHES = 5;
+	final int MAX_SHOTS = MAX_FISHES * 2;
 	boolean gameOver = false;
 	private GraphicsContext gc;
 	
 	Ship player;
+	Fish bonusFish;
 	List<Net> nets;
 	List<Ocean> oceans;
 	List<Fish> fishes;
 	
 	private double mouseX;
 	private int score;
+	private int health;
 	private int level;
-	
+	private int highScore;
+	private int limit;
+	private int scoreThen;
+	private File highScoreFile = new File("highscore.txt");
+
 	boolean shipDestroyed = false;
 	static final Image shipExplode = new Image("src/application/images/explosion.png");
-	
-	//run graphics
-  	private void run(GraphicsContext gc) {
-  		gc.setFill(Color.ROYALBLUE);
-		gc.fillRect(0, 0, WIDTH, HEIGHT);
-		gc.setTextAlign(TextAlignment.CENTER);
-		gc.setFont(Font.font(20));
-		gc.setFill(Color.WHITE);
-		gc.fillText("Score: " + score, 60,  20);
-		gc.fillText("Level: " + score, 60,  40);
-		gc.fillText("Health: " + nyawa + " %", 720,  20);
 
-  		if(gameOver) {
-  			gc.setFont(Font.font(35));
-  			gc.setFill(Color.YELLOW);
-  			gc.fillText("GameOver \n Your Score is: " + score + "\nClick to play again", WIDTH/2, HEIGHT/2.5);
-  		}
-  		
-  		oceans.forEach(Ocean::draw);
-		
-  		player.update();
-		player.draw();
-		player.posX= (int) mouseX;
-
-		fishes.stream().peek(Ship::update).peek(Ship::draw).forEach(e ->{
-			for (Fish fish : fishes) {
-				if(player.collide(fish) && !fish.exploding && !player.exploding) {
-					fish.explode();
-					gameOver=false;
-					nyawa-=20;
-				}
-			}
-		});
-		
-		if(nyawa==0) {
-			shipDestroyed=true;
-			player.explode();
-			player.destroyed=true;
-			gameOver=player.destroyed;
-		}
-			
-		for(int i = nets.size() - 1; i >= 0 ; i--) {
-			Net net = nets.get(i);
-			if(net.posY <0 || net.toRemove) {
-				nets.remove(i);
-				continue;
-			}
-			net.update();
-			net.draw();
-			for(Fish fish : fishes) {
-				if(net.collide(fish) && !fish.exploding) {
-					score++;
-					fish.explode();
-					net.toRemove= true;
-					if(score % 20 == 0){
-						level++;
-						//break;
-					}
-				}
-			}
-		}
-			
-		for(int i = fishes.size() - 1; i>=0; i--) {
-			if(fishes.get(i).destroyed) {
-				fishes.set(i,newFish());
-			}
-		}
-		
-		if(RAND.nextInt(10)>2) {
-			oceans.add(new Ocean());
-		}
-		
-		for(int i = 0; i< oceans.size(); i++) {
-			if(oceans.get(i).posY > HEIGHT)
-				oceans.remove(i);
-		}
-	}
-	//start
+//	start canvas
 	public void start(Stage stage) throws Exception {
 		Canvas canvas = new Canvas(WIDTH, HEIGHT);	
 		gc = canvas.getGraphicsContext2D();
@@ -161,15 +110,162 @@ public class FishSlayer extends Application{
 		stage.show();
 	}
 	
+//	initialize variables value
 	private void setup() {
 		oceans = new ArrayList<>();
 		nets = new ArrayList<>();
 		fishes = new ArrayList<>();
 		player = new Ship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
-		score = 0;
-		nyawa = 100;
-		level = 1;
 		IntStream.range(0, MAX_FISHES).mapToObj(i -> this.newFish()).forEach(fishes::add);
+		
+		score = 0;
+		health = 100;
+		level = 1;
+		highScore = 0;
+		limit = 1;
+		scoreThen = 0;
+		
+//		read highscore file
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(highScoreFile));
+            String line = reader.readLine();
+            
+            while (line != null) {
+                try {
+                    int score = Integer.parseInt(line.trim());
+                    
+                    if (score > highScore)
+                    	highScore = score;
+                } catch (NumberFormatException e1) {
+                    System.err.println("Ignore invalid score: " + line);
+                }
+                
+                line = reader.readLine();
+            }
+            
+            reader.close();
+        } catch (IOException ex) {
+            System.err.println("Error when reading from file");
+        }
+	}
+	
+//	run graphics (frame)
+  	private void run(GraphicsContext gc) {
+  		gc.setFill(Color.ROYALBLUE);
+      gc.fillRect(0, 0, WIDTH, HEIGHT);
+      gc.setTextAlign(TextAlignment.LEFT);
+      gc.setFont(Font.font(20));
+      gc.setFill(Color.WHITE);
+      gc.fillText("Score: " + score, 5,  20);
+      gc.fillText("Level: " + level, 5,  40);
+      gc.fillText("High Score: " + highScore, 5,  60);
+      gc.fillText("Health: " + health + " %", 730,  20);
+
+  		if(gameOver) {
+  			gc.setTextAlign(TextAlignment.CENTER);
+  			gc.setFont(Font.font(35));
+  			gc.setFill(Color.YELLOW);
+  			gc.fillText("Game Over\nYour Score is: " + score + "\nClick to play again", WIDTH/2, HEIGHT/2.5);
+  			
+//  		tulis skor ke file setiap kali mati
+            if (limit == 1) {
+                try {
+                    BufferedWriter output = new BufferedWriter(new FileWriter(highScoreFile, true));
+                    output.newLine();
+                    output.append("" + score);
+                    output.close();
+
+                } catch (IOException ex1) {
+                    System.out.printf("Error when writing to file: %s\n", ex1);
+                }
+                
+                limit--;
+            }
+  		}
+  		
+  		oceans.forEach(Ocean::draw);
+		
+  		player.update();
+		player.draw();
+		player.posX= (int) mouseX;
+
+		fishes.stream().peek(Ship::update).peek(Ship::draw).forEach(e ->{
+			for (Fish fish : fishes) {
+				if(player.collide(fish) && !fish.exploding && !player.exploding) {
+					fish.explode();
+					gameOver=false;
+					health -= 20;
+				}
+			}
+		});
+		
+		if(health == 0) {
+      shipDestroyed=true;
+			player.explode();
+			player.destroyed = true;
+			gameOver = player.destroyed;
+		}
+			
+		for(int i = nets.size() - 1; i >= 0 ; i--) {
+			Net net = nets.get(i);
+			
+			if(net.posY <0 || net.toRemove) {
+				nets.remove(i);
+				continue;
+			}
+			
+			net.update();
+			net.draw();
+			
+			for(Fish fish : fishes) {
+				if(net.collide(fish) && !fish.exploding) {
+					score++;
+					fish.explode();
+					net.toRemove= true;
+					if(score % 20 == 0){
+						level++;
+					}
+				}
+			}
+			
+			if (bonusFish != null) {
+				if(bonusFish.collide(bonusFish) && !bonusFish.exploding) {
+					score += 3;
+					bonusFish.explode();
+					net.toRemove = true;
+				}
+			}
+		}
+			
+		for(int i = fishes.size() - 1; i>=0; i--) {
+			if(fishes.get(i).destroyed) {
+				fishes.set(i,newFish());
+			}
+		}
+		
+		if(RAND.nextInt(10)>2) {
+			oceans.add(new Ocean());
+		}
+		
+		for(int i = 0; i< oceans.size(); i++) {
+			if(oceans.get(i).posY > HEIGHT)
+				oceans.remove(i);
+		}
+		
+		if (score > 0 && score % 10 == 0) {
+			if (!(scoreThen == score)) {
+				bonusFish = newBonusFish();
+				scoreThen = score;
+			}
+		}
+		
+		if (bonusFish != null) {
+			if(player.collide(bonusFish) && !player.exploding) {
+                player.explode();
+            }
+			bonusFish.update();
+			bonusFish.draw();
+		}
 	}
 	
 //	player
@@ -209,7 +305,8 @@ public class FishSlayer extends Application{
 				if (exploding) {
 					gc.drawImage(CAUGHT_IMG, explosionStep % EXPLOSION_COL * EXPLOSION_W, 
 							(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, EXPLOSION_H, posX, posY, size, size);
-				} else {
+				} 
+        else {
 					gc.drawImage(img, posY, posX, size, size);
 				}
 			}
@@ -228,22 +325,23 @@ public class FishSlayer extends Application{
 	}
 	
 	public class Fish extends Ship {
-		int SPEED = (score / 5) + 2;
+		int fishSpeed;
 		
-		public Fish (int posX, int posY, int size, Image image) {
+		public Fish (int posX, int posY, int size, Image image, int speed) {
 			super(posX, posY, size, image);
+			fishSpeed = speed;
 		}
 		
 		public void update() {
 			super.update();
-			if(!exploding && !destroyed) posY += SPEED;
+			if(!exploding && !destroyed) posY += fishSpeed;
 			if(posY > HEIGHT) destroyed = true;
 		}
 	}
 	
 	public class Net {
 		public boolean toRemove;
-		Image img=new Image("file:src/application/img/net.png");
+		Image img = new Image("file:src/application/img/net.png");
 		
 		int posX = 10;
 		int posY = 10;
@@ -280,21 +378,20 @@ public class FishSlayer extends Application{
 	public class Ocean {
 		int posX;
 		int posY;
-		private int h;
 		private int w;
 		private int r;
 		private int g;
 		private int b;
+		private double opacity;
 		
-		public Universe() {
+		public Ocean() {
 			posX = RAND.nextInt(WIDTH);
 			posY = 0;
 			
-			w = RAND.nestInt(5) + 1;
-			h = RAND.nestInt(5) + 1;
-			r = RAND.nestInt(100) + 150;
-			g = RAND.nestInt(100) + 150;
-			b = RAND.nestInt(100) + 150;
+			w = RAND.nextInt(5) + 1;
+			r = RAND.nextInt(100) + 150;
+			g = RAND.nextInt(100) + 150;
+			b = RAND.nextInt(100) + 150;
 			
 			opacity = RAND.nextFloat();
 			if(opacity < 0) opacity *= -1;
@@ -305,18 +402,22 @@ public class FishSlayer extends Application{
 			if(opacity > 0.8) opacity -= 0.01;
 			if(opacity < 0.1) opacity += 0.01;
 			gc.setFill(Color.rgb(r, g, b, opacity));
-			gc.fillOval(posX, posY, w, h);
+			gc.fillOval(posX, posY, w, b);
 			posY += 20;
 		}
 	}
 	
 	Fish newFish() {
-		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, FISHES_IMG[RAND.nextInt(FISHES_IMG.length)]);
+		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, FISHES_IMG[RAND.nextInt(FISHES_IMG.length)], (score/5)+2);
 		
 	}
+    
+    Fish newBonusFish() {
+        return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, PLAYER_IMG, 20);
+    }
 	
 	int distance (int x1, int y1, int x2, int y2) {
-		return (int) Math.sqrt(Math.pow(x1 - x2), 2) + Math.pow((y1 - y2), 2));
+		return (int) Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow((y1 - y2), 2));
 	}
 	
 	public static void main(String[] args) {
