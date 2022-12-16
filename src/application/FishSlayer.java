@@ -1,5 +1,11 @@
 package application;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -38,15 +44,15 @@ public class FishSlayer extends Application{
 	static final Image CAUGHT_IMG = new Image("file:src/application/img/caught.png");
 	
 	static final Image FISHES_IMG[] = {
-		new Image("file:src/application/img/01.png"),
-		new Image("file:src/application/img/02.png"),
-		new Image("file:src/application/img/03.png"),
-		new Image("file:src/application/img/04.png"),
-		new Image("file:src/application/img/05.png"),
-		new Image("file:src/application/img/06.png"),
-		new Image("file:src/application/img/07.png"),
-		new Image("file:src/application/img/08.png"),
-		new Image("file:src/application/img/09.png"),
+		new Image("file:src/application/img/1.png"),
+		new Image("file:src/application/img/2.png"),
+		new Image("file:src/application/img/3.png"),
+		new Image("file:src/application/img/4.png"),
+		new Image("file:src/application/img/5.png"),
+		new Image("file:src/application/img/6.png"),
+		new Image("file:src/application/img/7.png"),
+		new Image("file:src/application/img/8.png"),
+		new Image("file:src/application/img/9.png"),
 		new Image("file:src/application/img/10.png"),
 		new Image("file:src/application/img/11.png"),
 		new Image("file:src/application/img/12.png")
@@ -64,8 +70,12 @@ public class FishSlayer extends Application{
 	
 	private double mouseX;
 	private int score;
-	private int level;
 	private int health;
+	private int level;
+	private int highScore;
+	private int limit;
+	private int scoreThen;
+	private File highScoreFile = new File("highscore.txt");
 	
 //	start canvas
 	public void start(Stage stage) throws Exception {
@@ -102,27 +112,71 @@ public class FishSlayer extends Application{
 		nets = new ArrayList<>();
 		fishes = new ArrayList<>();
 		player = new Ship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
+		IntStream.range(0, MAX_FISHES).mapToObj(i -> this.newFish()).forEach(fishes::add);
+		
 		score = 0;
 		health = 100;
 		level = 1;
-		IntStream.range(0, MAX_FISHES).mapToObj(i -> this.newFish()).forEach(fishes::add);
+		highScore = 0;
+		limit = 1;
+		scoreThen = 0;
+		
+//		read highscore file
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(highScoreFile));
+            String line = reader.readLine();
+            
+            while (line != null) {
+                try {
+                    int score = Integer.parseInt(line.trim());
+                    
+                    if (score > highScore)
+                    	highScore = score;
+                } catch (NumberFormatException e1) {
+                    System.err.println("Ignore invalid score: " + line);
+                }
+                
+                line = reader.readLine();
+            }
+            
+            reader.close();
+        } catch (IOException ex) {
+            System.err.println("Error when reading from file");
+        }
 	}
 	
 //	run graphics (frame)
   	private void run(GraphicsContext gc) {
   		gc.setFill(Color.ROYALBLUE);
 		gc.fillRect(0, 0, WIDTH, HEIGHT);
-		gc.setTextAlign(TextAlignment.CENTER);
+		gc.setTextAlign(TextAlignment.LEFT);
 		gc.setFont(Font.font(20));
 		gc.setFill(Color.WHITE);
-		gc.fillText("Score: " + score, 60,  20);
-		gc.fillText("Level: " + level, 60,  40);
+		gc.fillText("Score: " + score, 5,  20);
+		gc.fillText("Level: " + level, 5,  40);
+		gc.fillText("High Score: " + highScore, 5,  60);
 		gc.fillText("Health: " + health + " %", 720,  20);
 
   		if(gameOver) {
+  			gc.setTextAlign(TextAlignment.CENTER);
   			gc.setFont(Font.font(35));
   			gc.setFill(Color.YELLOW);
-  			gc.fillText("Game Over \n Your Score is: " + score + "\nClick to play again", WIDTH/2, HEIGHT/2.5);
+  			gc.fillText("Game Over\nYour Score is: " + score + "\nClick to play again", WIDTH/2, HEIGHT/2.5);
+  			
+//  		tulis skor ke file setiap kali mati
+            if (limit == 1) {
+                try {
+                    BufferedWriter output = new BufferedWriter(new FileWriter(highScoreFile, true));
+                    output.newLine();
+                    output.append("" + score);
+                    output.close();
+
+                } catch (IOException ex1) {
+                    System.out.printf("Error when writing to file: %s\n", ex1);
+                }
+                
+                limit--;
+            }
   		}
   		
   		oceans.forEach(Ocean::draw);
@@ -149,12 +203,15 @@ public class FishSlayer extends Application{
 			
 		for(int i = nets.size() - 1; i >= 0 ; i--) {
 			Net net = nets.get(i);
+			
 			if(net.posY <0 || net.toRemove) {
 				nets.remove(i);
 				continue;
 			}
+			
 			net.update();
 			net.draw();
+			
 			for(Fish fish : fishes) {
 				if(net.collide(fish) && !fish.exploding) {
 					score++;
@@ -181,6 +238,13 @@ public class FishSlayer extends Application{
 		for(int i = 0; i< oceans.size(); i++) {
 			if(oceans.get(i).posY > HEIGHT)
 				oceans.remove(i);
+		}
+		
+		if (score > 0 && score % 10 == 0) {
+			if (!(scoreThen == score)) {
+//				bos = newBoss();
+				scoreThen = score;
+			}
 		}
 	}
 	
