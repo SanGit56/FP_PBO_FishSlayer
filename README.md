@@ -3,8 +3,8 @@ Game menangkap ikan yang terinspirasi dari Space Invaders. Dibuat untuk keperlua
 
 ## Catatan
 Berbasis bahasa pemrograman Java dan menggunakan library JavaFX. Dikembangkan oleh:
-1. Baihaqi - 5025211
-2. Farah - 5025211
+1. Baihaqi Rizki Nurfajri - 5025211044
+2. Farah Dhia Fadhila - 5025211030
 3. Radhiyan Muhammad Hisan - 5025211166
 
 ## Fitur Bawaan
