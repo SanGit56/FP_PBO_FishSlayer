@@ -219,15 +219,17 @@ public class FishSlayer extends Application{
 		}
 	}
 	
-	public class Shot {
+	public class Net {
 		public boolean toRemove;
+		Image img=new Image("file:src/application/img/net.png");
 		
 		int posX = 10;
 		int posY = 10;
 		int speed = 30;
+		
 		static final int size = 6;
 		
-		public Shot (int posX, int posY) {
+		public Net (int posX, int posY) {
 			this.posX = posX;
 			this.posY = posY;
 		}
@@ -237,20 +239,18 @@ public class FishSlayer extends Application{
 		}
 		
 		public void draw() {
-			gc.setFill(Color.RED);
-			if(score >= 20 && score <= 40 || score >= 120){
-				gc.setFill(Color.YELLOWGREEN);
+			if(score >= 40 && score <= 80 || score >= 120){
 				speed = 50;
-				gc.fillRect(posX - 5, posY - 10, size + 10, size + 30);
+				gc.drawImage(img, posX, posY,size+40,size+40);
 			} 
 			else {
-				gc.fillOval(posX, posY, size, size);
+				gc.drawImage(img, posX, posY,size+25,size+25);
 			}
 		}
 		
 		public boolean collide(Ship other) {
-			int distance = distance(this.posX + size / 2, this.posY + size / 2,
-					       other.posX + other.size / 2, other.posY + other.size / 2);
+			int distance = distance(this.posX + size, this.posY + size,
+					       other.posX + other.size, other.posY + other.size);
 			return distance < other.size / 2 + size / 2;
 		}
 	}
