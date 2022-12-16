@@ -46,16 +46,16 @@ public class FishSlayer extends Application{
 	static final Image EXPLOSION_IMG = new Image("file:src/application/images/explosion.png");
 	
 	static final Image FISHES_IMG[] = {
-		new Image("file:src/application/img/1.png"),
-		new Image("file:src/application/img/2.png"),
-		new Image("file:src/application/img/3.png"),
-		new Image("file:src/application/img/4.png"),
-		new Image("file:src/application/img/5.png"),
-		new Image("file:src/application/img/6.png"),
-		new Image("file:src/application/img/7.png"),
-		new Image("file:src/application/img/8.png"),
-		new Image("file:src/application/img/9.png"),
-		new Image("file:src/application/img/10.png")
+		new Image("file:src/application/images/1.png"),
+		new Image("file:src/application/images/2.png"),
+		new Image("file:src/application/images/3.png"),
+		new Image("file:src/application/images/4.png"),
+		new Image("file:src/application/images/5.png"),
+		new Image("file:src/application/images/6.png"),
+		new Image("file:src/application/images/7.png"),
+		new Image("file:src/application/images/8.png"),
+		new Image("file:src/application/images/9.png"),
+		new Image("file:src/application/images/10.png")
 	};
 	
 	final int MAX_FISHES = 5;
@@ -300,7 +300,7 @@ public class FishSlayer extends Application{
 							(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, 
 							EXPLOSION_H, posX, posY, size, size);
 				}
-			} else gc.drawImage(img, posY, posX, size, size);
+			} else gc.drawImage(img, posX, posY, size, size);
 		}
 		
 		public boolean collide(Ship other) {
@@ -370,6 +370,7 @@ public class FishSlayer extends Application{
 		int posX;
 		int posY;
 		private int w;
+		private int h;
 		private int r;
 		private int g;
 		private int b;
@@ -380,6 +381,7 @@ public class FishSlayer extends Application{
 			posY = 0;
 			
 			w = RAND.nextInt(5) + 1;
+			h =  RAND.nextInt(5) + 1;
 			r = RAND.nextInt(100) + 150;
 			g = RAND.nextInt(100) + 150;
 			b = RAND.nextInt(100) + 150;
