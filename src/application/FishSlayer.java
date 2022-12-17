@@ -193,14 +193,8 @@ public class FishSlayer extends Application{
 				if(player.collide(fish) && !fish.exploding && !player.exploding) {
 					fish.explode();
 					gameOver = false;
-					health -= 20;
-					if(health>0)
-						health-=60;
-					else if(health <= 0) {
-						shipDestroyed = true;
-						player.explode();
-	                			player.destroyed = true;
-	                			gameOver = player.destroyed;
+					if(health>0) 
+						Math.max(0, health-=20);
 	                		}
 				}
 			}
@@ -262,18 +256,19 @@ public class FishSlayer extends Application{
 		if (bonusFish != null) {
 			if(player.collide(bonusFish) && !player.exploding && !bonusFish.exploding) {
                 		bonusFish.explode();
-				if(health>0)
-					health-=60;
-				else if(health <= 0) {
-					shipDestroyed = true;
-					player.explode();
-                			player.destroyed = true;
-                			gameOver = player.destroyed;
+				if(health>0) 
+					Math.max(0, health-=60);
                 		}
 			}
 			bonusFish.update();
 			bonusFish.draw();
 		}
+		if(health <= 0) {
+			shipDestroyed = true;
+			player.explode();
+        		player.destroyed = true;
+        		gameOver = player.destroyed;
+        	}
 	}
 	
 //	player
@@ -417,7 +412,7 @@ public class FishSlayer extends Application{
 	}
     
     Fish newBonusFish() {
-		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, BONUSFISH_IMG, 20);
+		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE+75, BONUSFISH_IMG, 20);
 	}
 	
 	int distance (int x1, int y1, int x2, int y2) {
