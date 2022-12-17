@@ -13,17 +13,16 @@ Berbasis bahasa pemrograman Java dan menggunakan library JavaFX. Dikembangkan ol
 3. Game over (memunculkan jumlah skor yang didapatkan dan akan memainkan game kembali apabila player menekan pada layar) 
 
 ## Fitur Tambahan
-
-1. Skor Tertinggi(Menampilkan skor tertinggi pada saat game over dan menyimpan skor apabila skor tersebut lebih tinggi dari sebelumnya dalam file terpisah)
-2. Musuh bonus(musuh yang akan muncul setiap skor dengan kelipatan 10 yang bergerak dengan cepat dan memberikan poin sebesar 3 apabila ditangkap)
-3. Level(level akan bertambah setiap kali player mencapai skor dengan kelipatan 20)
-4. Nyawa(playerakan diberikan nyawa sebesar 100% dan akan berkurang sebanyak 20% setiap kali terkena atau menabrak ikan)
+1. Skor tinggi (menyimpan skor setiap kali game over dan akan ditampilkan pada sesi game berikutnya)
+2. Musuh bonus (musuh yang akan muncul setiap skor kelipatan 10, bergerak lebih cepat, dan memberikan 3 poin)
+3. Experience (experience akan bertambah setiap kali player mencapai skor kelipatan 20)
+4. Nyawa (player akan diberikan nyawa sebesar 100% dan akan berkurang sebanyak 20% setiap terkena ikan biasa dan 60% setiap terkena musuh bonus)
 
 ## Pergantian Tema
--Mengganti tema luar angkasa pada video referensi menjadi bawah laut<br/>
--Player yang sebelumnya menggunakan roket, sekarang menggunakan kapal selam<br/>
--Mengganti roket menjadi ikan-ikan yang berenang menuju player<br/>
--Mengganti tembakan dengan sebuah jaring yang akan digunakan untuk menangkap ikan
+1. Mengganti tema luar angkasa pada video referensi menjadi bawah laut
+2. Player yang sebelumnya menggunakan roket, sekarang menggunakan kapal selam
+3. Mengganti bomb menjadi ikan
+4. Mengganti tembakan dengan jaring/jala
 
 ## Referensi
 1. [Video bagian 1](https://www.youtube.com/watch?v=0szmaHH1hno)

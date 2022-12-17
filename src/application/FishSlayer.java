@@ -72,7 +72,7 @@ public class FishSlayer extends Application{
 	private double mouseX;
 	private int score;
 	private int health;
-	private int level;
+	private int exp;
 	private int highScore;
 	private int limit;
 	private int scoreThen;
@@ -118,7 +118,7 @@ public class FishSlayer extends Application{
 		
 		score = 0;
 		health = 100;
-		level = 1;
+		exp = 0;
 		highScore = 0;
 		limit = 1;
 		scoreThen = 0;
@@ -155,7 +155,7 @@ public class FishSlayer extends Application{
 		gc.setFont(Font.font(20));
 		gc.setFill(Color.WHITE);
 		gc.fillText("Score: " + score, 5,  20);
-		gc.fillText("Level: " + level, 5,  40);
+		gc.fillText("Experience: " + exp, 5,  40);
 		gc.fillText("High Score: " + highScore, 5,  60);
 		gc.fillText("Health: " + health + " %", 670,  20);
 
@@ -185,13 +185,13 @@ public class FishSlayer extends Application{
 		
   		player.update();
 		player.draw();
-		player.posX= (int) mouseX;
+		player.posX = (int) mouseX;
 
 		fishes.stream().peek(Ship::update).peek(Ship::draw).forEach(e ->{
 			for (Fish fish : fishes) {
 				if(player.collide(fish) && !fish.exploding && !player.exploding) {
 					fish.explode();
-					gameOver=false;
+					gameOver = false;
 					health -= 20;
 				}
 			}
@@ -221,7 +221,7 @@ public class FishSlayer extends Application{
 					fish.explode();
 					net.toRemove= true;
 					if(score % 20 == 0){
-						level++;
+						exp++;
 					}
 				}
 			}
@@ -259,7 +259,7 @@ public class FishSlayer extends Application{
 		
 		if (bonusFish != null) {
 			if(player.collide(bonusFish) && !player.exploding) {
-                		health--;
+                		health -= 60;
             		}
 			bonusFish.update();
 			bonusFish.draw();
@@ -407,7 +407,7 @@ public class FishSlayer extends Application{
 	}
     
     Fish newBonusFish() {
-		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, PLAYER_IMG, 20);
+		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, BONUSFISH_IMG, 20);
 	}
 	
 	int distance (int x1, int y1, int x2, int y2) {
