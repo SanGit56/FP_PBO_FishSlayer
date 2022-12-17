@@ -46,16 +46,16 @@ public class FishSlayer extends Application{
 	static final Image EXPLOSION_IMG = new Image("file:src/application/images/explosion.png");
 	
 	static final Image FISHES_IMG[] = {
-		new Image("file:src/application/img/1.png"),
-		new Image("file:src/application/img/2.png"),
-		new Image("file:src/application/img/3.png"),
-		new Image("file:src/application/img/4.png"),
-		new Image("file:src/application/img/5.png"),
-		new Image("file:src/application/img/6.png"),
-		new Image("file:src/application/img/7.png"),
-		new Image("file:src/application/img/8.png"),
-		new Image("file:src/application/img/9.png"),
-		new Image("file:src/application/img/10.png")
+		new Image("file:src/application/images/1.png"),
+		new Image("file:src/application/images/2.png"),
+		new Image("file:src/application/images/3.png"),
+		new Image("file:src/application/images/4.png"),
+		new Image("file:src/application/images/5.png"),
+		new Image("file:src/application/images/6.png"),
+		new Image("file:src/application/images/7.png"),
+		new Image("file:src/application/images/8.png"),
+		new Image("file:src/application/images/9.png"),
+		new Image("file:src/application/images/10.png")
 	};
 	
 	final int MAX_FISHES = 5;
@@ -157,7 +157,7 @@ public class FishSlayer extends Application{
 		gc.fillText("Score: " + score, 5,  20);
 		gc.fillText("Level: " + level, 5,  40);
 		gc.fillText("High Score: " + highScore, 5,  60);
-		gc.fillText("Health: " + health + " %", 730,  20);
+		gc.fillText("Health: " + health + " %", 670,  20);
 
   		if(gameOver) {
   			gc.setTextAlign(TextAlignment.CENTER);
@@ -227,7 +227,7 @@ public class FishSlayer extends Application{
 			}
 			
 			if (bonusFish != null) {
-				if(bonusFish.collide(bonusFish) && !bonusFish.exploding) {
+				if(net.collide(bonusFish) && !bonusFish.exploding) {
 					score += 3;
 					bonusFish.explode();
 					net.toRemove = true;
@@ -259,7 +259,7 @@ public class FishSlayer extends Application{
 		
 		if (bonusFish != null) {
 			if(player.collide(bonusFish) && !player.exploding) {
-                		player.explode();
+                		health--;
             		}
 			bonusFish.update();
 			bonusFish.draw();
@@ -300,7 +300,7 @@ public class FishSlayer extends Application{
 							(explosionStep / EXPLOSION_ROWS) * EXPLOSION_H + 1, EXPLOSION_W, 
 							EXPLOSION_H, posX, posY, size, size);
 				}
-			} else gc.drawImage(img, posY, posX, size, size);
+			} else gc.drawImage(img, posX, posY, size, size);
 		}
 		
 		public boolean collide(Ship other) {
@@ -370,6 +370,7 @@ public class FishSlayer extends Application{
 		int posX;
 		int posY;
 		private int w;
+		private int h;
 		private int r;
 		private int g;
 		private int b;
@@ -380,6 +381,7 @@ public class FishSlayer extends Application{
 			posY = 0;
 			
 			w = RAND.nextInt(5) + 1;
+			h =  RAND.nextInt(5) + 1;
 			r = RAND.nextInt(100) + 150;
 			g = RAND.nextInt(100) + 150;
 			b = RAND.nextInt(100) + 150;
@@ -393,7 +395,7 @@ public class FishSlayer extends Application{
 			if(opacity > 0.8) opacity -= 0.01;
 			if(opacity < 0.1) opacity += 0.01;
 			gc.setFill(Color.rgb(r, g, b, opacity));
-			gc.fillOval(posX, posY, w, b);
+			gc.fillOval(posX, posY, w, h);
 			posY += 20;
 		}
 	}
