@@ -22,7 +22,7 @@ Berbasis bahasa pemrograman Java dan menggunakan library JavaFX. Dikembangkan ol
 1. Mengganti tema luar angkasa pada video referensi menjadi bawah laut
 2. Player yang sebelumnya menggunakan roket, sekarang menggunakan kapal selam
 3. Mengganti bomb menjadi ikan
-4. Mengganti tembakan dengan jaring/jala
+4. Mengganti tembakan dengan mata kail dan jaring/jala
 
 ## Referensi
 1. [Video bagian 1](https://www.youtube.com/watch?v=0szmaHH1hno)
