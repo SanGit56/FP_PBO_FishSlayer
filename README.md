@@ -15,7 +15,7 @@ Berbasis bahasa pemrograman Java dan menggunakan library JavaFX. Dikembangkan ol
 ## Fitur Tambahan
 1. Skor tinggi (menyimpan skor setiap kali game over dan akan ditampilkan pada sesi game berikutnya)
 2. Musuh bonus (musuh yang akan muncul setiap skor kelipatan 10, bergerak lebih cepat, dan memberikan 3 poin)
-3. Experience (experience akan bertambah setiap kali player mencapai skor kelipatan 20)
+3. Level (Level akan bertambah 1 jika skor kelipatan 20 dan mata kail akan berubah menjadi jaring)
 4. Nyawa (player akan diberikan nyawa sebesar 100% dan akan berkurang sebanyak 20% setiap terkena ikan biasa dan 60% setiap terkena musuh bonus)
 
 ## Pergantian Tema
