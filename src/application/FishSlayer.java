@@ -25,6 +25,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.event.EventHandler;
 
 public class FishSlayer extends Application{
 //	variables
@@ -72,7 +73,7 @@ public class FishSlayer extends Application{
 	private double mouseX;
 	private int score;
 	private int health;
-	private int level;
+	private int exp;
 	private int highScore;
 	private int limit;
 	private int scoreThen;
@@ -118,7 +119,7 @@ public class FishSlayer extends Application{
 		
 		score = 0;
 		health = 100;
-		level = 1;
+		exp = 0;
 		highScore = 0;
 		limit = 1;
 		scoreThen = 0;
@@ -155,7 +156,7 @@ public class FishSlayer extends Application{
 		gc.setFont(Font.font(20));
 		gc.setFill(Color.WHITE);
 		gc.fillText("Score: " + score, 5,  20);
-		gc.fillText("Level: " + level, 5,  40);
+		gc.fillText("Experience: " + exp, 5,  40);
 		gc.fillText("High Score: " + highScore, 5,  60);
 		gc.fillText("Health: " + health + " %", 670,  20);
 
@@ -185,13 +186,13 @@ public class FishSlayer extends Application{
 		
   		player.update();
 		player.draw();
-		player.posX= (int) mouseX;
+		player.posX = (int) mouseX - 35;
 
 		fishes.stream().peek(Ship::update).peek(Ship::draw).forEach(e ->{
 			for (Fish fish : fishes) {
 				if(player.collide(fish) && !fish.exploding && !player.exploding) {
 					fish.explode();
-					gameOver=false;
+					gameOver = false;
 					health -= 20;
 					if(health>0)
 						health-=60;
@@ -208,7 +209,7 @@ public class FishSlayer extends Application{
 		for(int i = nets.size() - 1; i >= 0 ; i--) {
 			Net net = nets.get(i);
 			
-			if(net.posY <0 || net.toRemove) {
+			if(net.posY < 0 || net.toRemove) {
 				nets.remove(i);
 				continue;
 			}
@@ -220,9 +221,9 @@ public class FishSlayer extends Application{
 				if(net.collide(fish) && !fish.exploding) {
 					score++;
 					fish.explode();
-					net.toRemove= true;
+					net.toRemove = true;
 					if(score % 20 == 0){
-						level++;
+						exp++;
 					}
 				}
 			}
@@ -242,7 +243,7 @@ public class FishSlayer extends Application{
 			}
 		}
 		
-		if(RAND.nextInt(10)>2) {
+		if(RAND.nextInt(10) > 2) {
 			oceans.add(new Ocean());
 		}
 		
@@ -341,7 +342,7 @@ public class FishSlayer extends Application{
 	
 	public class Net {
 		public boolean toRemove;
-		Image img = new Image("file:src/application/img/net.png");
+		Image img = new Image("file:src/application/images/net.png");
 		
 		int posX = 10;
 		int posY = 10;
@@ -416,7 +417,7 @@ public class FishSlayer extends Application{
 	}
     
     Fish newBonusFish() {
-		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, PLAYER_IMG, 20);
+		return new Fish(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, BONUSFISH_IMG, 20);
 	}
 	
 	int distance (int x1, int y1, int x2, int y2) {
