@@ -194,17 +194,17 @@ public class FishSlayer extends Application{
 					fish.explode();
 					gameOver = false;
 					health -= 20;
+					if(health>0)
+						health-=60;
+					else if(health <= 0) {
+						shipDestroyed = true;
+						player.explode();
+	                			player.destroyed = true;
+	                			gameOver = player.destroyed;
+	                		}
 				}
 			}
 		});
-		
-		if(health <= 0) {
-			health = 0;
-			shipDestroyed = true;
-			player.explode();
-			player.destroyed = true;
-			gameOver = player.destroyed;
-		}
 			
 		for(int i = nets.size() - 1; i >= 0 ; i--) {
 			Net net = nets.get(i);
@@ -260,9 +260,17 @@ public class FishSlayer extends Application{
 		}
 		
 		if (bonusFish != null) {
-			if(player.collide(bonusFish) && !player.exploding) {
-                health -= 60;
-            }
+			if(player.collide(bonusFish) && !player.exploding && !bonusFish.exploding) {
+                		bonusFish.explode();
+				if(health>0)
+					health-=60;
+				else if(health <= 0) {
+					shipDestroyed = true;
+					player.explode();
+                			player.destroyed = true;
+                			gameOver = player.destroyed;
+                		}
+			}
 			bonusFish.update();
 			bonusFish.draw();
 		}
