@@ -77,6 +77,7 @@ public class FishSlayer extends Application{
 	private int highScore;
 	private int limit;
 	private int scoreThen;
+	private int level;
 	private File highScoreFile = new File("highscore.txt");
 	boolean shipDestroyed = false;
 
@@ -123,6 +124,7 @@ public class FishSlayer extends Application{
 		highScore = 0;
 		limit = 1;
 		scoreThen = 0;
+		level = 1;
 		
 //		read highscore file
         try {
@@ -143,9 +145,10 @@ public class FishSlayer extends Application{
             }
             
             reader.close();
-        } catch (IOException ex) {
-            System.err.println("Error when reading from file");
-        }
+        } 
+        catch (IOException ex) {
+                System.err.println("Error when reading from file");
+            }
 	}
 	
 //	run graphics (frame)
@@ -155,10 +158,13 @@ public class FishSlayer extends Application{
 		gc.setTextAlign(TextAlignment.LEFT);
 		gc.setFont(Font.font(20));
 		gc.setFill(Color.WHITE);
+
 		gc.fillText("Score: " + score, 5,  20);
-		gc.fillText("Experience: " + exp, 5,  40);
-		gc.fillText("High Score: " + highScore, 5,  60);
+		gc.fillText("Level: " + level, 5,  40);
+		gc.fillText("Experience: " + exp, 5,  60);
+		gc.fillText("High Score: " + highScore, 5,  80);
 		gc.fillText("Health: " + health + " %", 670,  20);
+	
 
   		if(gameOver) {
   			gc.setTextAlign(TextAlignment.CENTER);
@@ -192,10 +198,8 @@ public class FishSlayer extends Application{
 			for (Fish fish : fishes) {
 				if(player.collide(fish) && !fish.exploding && !player.exploding) {
 					fish.explode();
-					gameOver = false;
-					if(health>0) 
-						Math.max(0, health-=20);
-	                		}
+					gameOver=false;
+					nyawa-=20;
 				}
 			}
 		});
@@ -217,6 +221,7 @@ public class FishSlayer extends Application{
 					fish.explode();
 					net.toRemove = true;
 					if(score % 20 == 0){
+						level++;
 						exp++;
 					}
 				}
@@ -245,6 +250,46 @@ public class FishSlayer extends Application{
 			if(oceans.get(i).posY > HEIGHT)
 				oceans.remove(i);
 		}
+    
+	}
+	//start
+	public void start(Stage stage) throws Exception {
+		Canvas canvas = new Canvas(WIDTH, HEIGHT);	
+		gc = canvas.getGraphicsContext2D();
+
+		Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), e -> run(gc)));
+		timeline.setCycleCount(Timeline.INDEFINITE);
+		timeline.play();
+
+		canvas.setCursor(Cursor.MOVE);
+		canvas.setOnMouseMoved(e -> mouseX = e.getX());
+
+		canvas.setOnMouseClicked(e -> {
+			if(nets.size() < MAX_SHOTS) 
+				nets.add(player.shoot());
+			
+			if(gameOver) { 
+				gameOver = false;
+				setup();
+			}
+		});
+
+		setup();
+			
+		stage.setScene(new Scene(new StackPane(canvas)));
+		stage.setTitle("Fish Slayer");
+		stage.show();
+	}
+	
+	private void setup() {
+		oceans = new ArrayList<>();
+		nets = new ArrayList<>();
+		fishes = new ArrayList<>();
+		player = new Ship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
+		score = 0;
+		nyawa = 100;
+		level = 1;
+		IntStream.range(0, MAX_FISHES).mapToObj(i -> this.newFish()).forEach(fishes::add);
 		
 		if (score > 0 && score % 10 == 0) {
 			if (!(scoreThen == score)) {
@@ -256,9 +301,9 @@ public class FishSlayer extends Application{
 		if (bonusFish != null) {
 			if(player.collide(bonusFish) && !player.exploding && !bonusFish.exploding) {
                 		bonusFish.explode();
-				if(health>0) 
+				if(health>0) {
 					Math.max(0, health-=60);
-                		}
+                }
 			}
 			bonusFish.update();
 			bonusFish.draw();
@@ -337,7 +382,8 @@ public class FishSlayer extends Application{
 	
 	public class Net {
 		public boolean toRemove;
-		Image img = new Image("file:src/application/images/net.png");
+		Image netImg = new Image("file:src/application/images/net.png");
+		Image hookImg = new Image("file:src/application/images/hook.png");
 		
 		int posX = 10;
 		int posY = 10;
@@ -355,18 +401,21 @@ public class FishSlayer extends Application{
 		}
 		
 		public void draw() {
-			if(score >= 40 && score <= 80 || score >= 120){
-				speed = 50;
-				gc.drawImage(img, posX, posY,size+40,size+40);
+			if(level % 2 == 0){
+				if(score >= 40 && score <= 80 || score >= 120){
+					speed = 50;
+					gc.drawImage(netImg, posX, posY,size+40,size+40);
+				}
+				gc.drawImage(netImg, posX, posY,size+40,size+40);
 			} 
 			else {
-				gc.drawImage(img, posX, posY,size+25,size+25);
+				gc.drawImage(hookImg, posX, posY,size+25,size+25);
 			}
 		}
 		
 		public boolean collide(Ship other) {
-			int distance = distance(this.posX + size, this.posY + size,
-					       other.posX + other.size, other.posY + other.size);
+			int distance = distance(this.posX + size / 2, this.posY + size / 2,
+					       other.posX + other.size / 2, other.posY + other.size / 2);
 			return distance < other.size / 2 + size / 2;
 		}
 	}
