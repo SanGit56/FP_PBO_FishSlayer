@@ -1,12 +1,11 @@
 # Fish Slayer
-Game menangkap ikan yang terinspirasi dari Space Invaders. Dibuat untuk keperluan final project mata kuliah Pemrograman Berorientasi Objek kelas A
+Game menangkap ikan yang terinspirasi dari Space Invaders. Dibuat untuk keperluan final project mata kuliah Pemrograman Berorientasi Objek kelas A. [Video presentasi](https://www.youtube.com/watch?v=5DOnZRazr4M)
 
 ## Catatan
 Berbasis bahasa pemrograman Java dan menggunakan library JavaFX. Dikembangkan oleh:
 1. Baihaqi Rizki Nurfajri - 5025211044
 2. Farah Dhia Fadhila - 5025211030
 3. Radhiyan Muhammad Hisan - 5025211166
-[Video presentasi](https://www.youtube.com/watch?v=5DOnZRazr4M)
 
 ## Fitur Bawaan
 1. Objek player (dapat menembak dan meledak saat bertabrakan)
