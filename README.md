@@ -6,6 +6,7 @@ Berbasis bahasa pemrograman Java dan menggunakan library JavaFX. Dikembangkan ol
 1. Baihaqi Rizki Nurfajri - 5025211044
 2. Farah Dhia Fadhila - 5025211030
 3. Radhiyan Muhammad Hisan - 5025211166
+[Video presentasi](https://www.youtube.com/watch?v=5DOnZRazr4M)
 
 ## Fitur Bawaan
 1. Objek player (dapat menembak dan meledak saat bertabrakan)
